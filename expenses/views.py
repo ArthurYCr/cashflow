@@ -200,7 +200,7 @@ def get_expense(request, pk):
     return render(request, 'expenses/show.html', {
         'expense': expense,
         'may_account': request.user.profile.may_account(),
-        'may_unattest': request.user.profile.may_unattest()
+        'may_unattest': request.user.profile.may_unattest() and not expense.reimbursement
     })
 
 
