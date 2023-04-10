@@ -67,6 +67,23 @@ def attest_expense_part(request, pk):
         return HttpResponseRedirect(reverse('admin-attest'))
     return HttpResponseRedirect(reverse('expenses-show', kwargs={'pk': expense_part.expense.id}))
 
+@require_POST
+@login_required
+@user_passes_test(lambda u: u.profile.is_admin())
+def unattest_expense(request, pk):
+    try:
+        expense_parts = ExpensePart.objects.filter(expense_id=int(pk))
+
+        if not request.user.profile.is_admin():
+            return HttpResponseRedirect(reverse('expenses-show', kwargs={'pk': int(pk)}))
+
+        for part in expense_parts:
+            part.unattest(request.user)
+    except ObjectDoesNotExist:
+        raise Http404("Kvittodelarna finns inte")
+
+    return HttpResponseRedirect(reverse('expenses-show', kwargs={'pk': int(pk)}))
+
 
 @require_POST
 @login_required
